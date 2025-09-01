@@ -82,7 +82,7 @@ app.post("/bruxos", (req,res) => {
         message: "Novo bruxo adicionado a Hogwarts",
         data: novoBruxo,
     });
-})
+});
 
 app.get("/varinhas", (req, res) => {
     const { material, nucleo, comprimento} = req.query;
@@ -109,18 +109,18 @@ app.get("/varinhas", (req, res) => {
 app.post("/varinhas", (req,res) => {
     const{material, nucleo, comprimento} = req.body;
 
-    if (!material || !nucleo) {
+    if (!material || !nucleo || !comprimento) {
         return res.status(400).json({
-            success:false,
-            message: "material e nucleo são obrigatórios para uma varinha!",
+            success: false,
+            message: "material, nucleo e comprimento são obrigatórios para uma varinha!",
         });
     }
 
     const novaVarinha = {
         id: varinhas.length + 1,
-        material,
+        material: material,
         nucleo: nucleo,
-        comprimento:parseInt(comprimento),
+        comprimento:comprimento
     }
 
     varinhas.push(novaVarinha);
@@ -130,7 +130,7 @@ app.post("/varinhas", (req,res) => {
         message: "Nova varinha adicionada com sucesso",
         data: novaVarinha,
     });
-})
+});
 
 
 app.get("/pocoes", (req, res) => {
@@ -152,6 +152,31 @@ app.get("/pocoes", (req, res) => {
     });
 });
 
+app.post("/pocoes", (req,res) => {
+    const{nome, efeito} = req.body;
+
+    if (!nome || !efeito ) {
+        return res.status(400).json({
+            success: false,
+            message: "nome e efeito são obrigatórios para uma poção!",
+        });
+    }
+
+    const novaPocao = {
+        id: pocoes.length + 1,
+        nome: nome,
+        efeito: efeito
+    }
+
+    pocoes.push(novaPocao);
+
+    res.status(201).json({
+        success: true,
+        message: "Nova poção adicionada com sucesso",
+        data: novaPocao,
+    });
+});
+
 app.get("/animais", (req, res) => {
     const { nome, tipo, } = req.query;
     let filtroAnimais = animais;
@@ -170,6 +195,43 @@ app.get("/animais", (req, res) => {
         data: filtroAnimais,
     });
 });
+
+app.post("/animais", (req,res) => {
+    const{nome, tipo} = req.body;
+
+    if (!nome || !tipo ) {
+        return res.status(400).json({
+            success: false,
+            message: "nome e tipo são obrigatórios para um animal!",
+        });
+    }
+
+    const novoAnimal = {
+        id: animais.length + 1,
+        nome: nome,
+        tipo: tipo
+    }
+
+    animais.push(novoAnimal);
+
+    res.status(201).json({
+        success: true,
+        message: "Novo animal adicionado com sucesso",
+        data: novoAnimal,
+    });
+})
+
+app.get("/stats", (req, res) => {
+    const{casa} = req.query;
+    let resultado = bruxos;
+    if (casa) {
+        resultado = resultado.filter(c => c.casa.toLowerCase().includes(casa.toLowerCase()));
+    }
+    res.status(200).json({
+        bruxos: `${casa} = ${resultado.length}`
+    });
+});
+
 
 // Iniciar servidor escutando na porta definida
 app.listen(serverPort, () => {
